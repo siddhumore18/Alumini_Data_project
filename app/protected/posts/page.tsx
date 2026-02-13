@@ -196,24 +196,20 @@ export default function PostsPage() {
       const postsWithProfilesBase = otherUsersPosts.map((post) => {
         const profile = profilesData?.find((p) => p.id === post.user_id)
 
-        // Build full name from first_name + last_name (full_name field doesn't exist in profiles table)
+        // Build full name more reliably
         let fullName = "Anonymous User"
         if (profile) {
-          // Build name from first_name + last_name
           const firstName = (profile.first_name || "").trim()
           const lastName = (profile.last_name || "").trim()
 
-          if (firstName || lastName) {
-            fullName = `${firstName} ${lastName}`.trim()
-          }
-
-          // If still empty after combining, use email as fallback
-          if (!fullName || fullName === "") {
-            if (profile.email) {
-              fullName = profile.email.split("@")[0] || "User"
-            } else {
-              fullName = "Anonymous User"
-            }
+          if (firstName && lastName) {
+            fullName = `${firstName} ${lastName}`
+          } else if (firstName) {
+            fullName = firstName
+          } else if (lastName) {
+            fullName = lastName
+          } else if (profile.email) {
+            fullName = profile.email.split("@")[0]
           }
         } else {
           console.warn(`No profile found for user_id: ${post.user_id}`)
@@ -223,14 +219,15 @@ export default function PostsPage() {
           profile_exists: !!profile,
           first_name: profile?.first_name,
           last_name: profile?.last_name,
-          email: profile?.email
+          email: profile?.email,
+          computed_name: fullName
         })
 
         return {
           ...post,
           profiles: profile
             ? {
-              full_name: fullName !== "Anonymous User" ? fullName : (profile.email?.split("@")[0] || "User"),
+              full_name: fullName,
               email: profile.email || "",
               avatar_url: profile.avatar_url || profile.profile_picture_url || null,
               linkedin_url: profile.linkedin_url || null,
