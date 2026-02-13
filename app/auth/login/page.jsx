@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,7 +10,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Eye, EyeOff } from "lucide-react"
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -159,5 +159,20 @@ export default function LoginPage() {
         </div>
       </div>
     </Card>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <Card className="w-full max-w-md border-primary/10 shadow-2xl bg-card/95 backdrop-blur-xl">
+        <div className="p-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Welcome Back</h1>
+          <p className="text-muted-foreground mb-8">Loading...</p>
+        </div>
+      </Card>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
