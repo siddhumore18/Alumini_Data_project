@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-export default function ProfilePage() {
+function ProfileContent() {
   const [profile, setProfile] = useState<any>(null)
   const [formData, setFormData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -203,7 +203,7 @@ export default function ProfilePage() {
         if (!error) {
           setMessage(
             "Profile saved, but some new fields (like Graduation Year) are not in your database yet. " +
-              "Please run `scripts/015_add_role_specific_fields.sql` in Supabase SQL Editor, then refresh."
+            "Please run `scripts/015_add_role_specific_fields.sql` in Supabase SQL Editor, then refresh."
           )
         }
       }
@@ -577,5 +577,17 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-background text-foreground">
+        <div className="text-center font-medium">Loading profile...</div>
+      </div>
+    }>
+      <ProfileContent />
+    </Suspense>
   )
 }
